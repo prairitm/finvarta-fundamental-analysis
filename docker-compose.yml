@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    env_file:
+      - .env
+    environment:
+      # Override with .env values, with fallbacks
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SCREENER_COOKIE_HEADER: ${SCREENER_COOKIE_HEADER:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_WHATSAPP_NUMBER: ${TWILIO_WHATSAPP_NUMBER:-}
+      WHATSAPP_RECIPIENTS: ${WHATSAPP_RECIPIENTS:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_MAX_TOKENS: ${OPENAI_MAX_TOKENS:-1000}
+      OPENAI_TEMPERATURE: ${OPENAI_TEMPERATURE:-0}
+      OPENAI_MAX_TEXT_LENGTH: ${OPENAI_MAX_TEXT_LENGTH:-12000}
+      DELAY_BETWEEN_REQUESTS: ${DELAY_BETWEEN_REQUESTS:-2}
+      ANALYSIS_SERVER_HOST: ${ANALYSIS_SERVER_HOST:-0.0.0.0}
+      ANALYSIS_SERVER_PORT: ${ANALYSIS_SERVER_PORT:-8000}
+      ANALYSIS_SERVER_RELOAD: ${ANALYSIS_SERVER_RELOAD:-false}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "4173:80"
+    restart: unless-stopped
+
